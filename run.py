@@ -1,4 +1,5 @@
 import click
+import json
 
 from gtfs_isochrone import prepare as _prepare, main
 
@@ -34,8 +35,11 @@ def demo():
 @click.argument("gtfs_folder")
 def server(gtfs_folder):
     import bottle
+    config = {"gtfs_folder": gtfs_folder}
+    with open("config.json","w") as f:
+        json.dump(config, f)
     from server import app
-
+    
     bottle.run(app=app, reloader=True, host="localhost", port=9090)
 
 

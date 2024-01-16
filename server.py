@@ -1,12 +1,17 @@
 import bottle
 from bottle import request, response
 import datetime
+import sys, json
 
 from gtfs_isochrone import main, load
 
+print("ARGS:",sys.argv)
 
 app = application = bottle.Bottle()
-data = load.load_prepared_data("data/orleans")
+
+with open("config.json") as f:
+    config = json.load(f)
+data = load.load_prepared_data(config["gtfs_folder"])
 
 
 @app.route("/isochrone", method="GET")
