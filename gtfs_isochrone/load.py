@@ -1,42 +1,44 @@
 import os
 from collections import namedtuple
+from pathlib import Path
 
 import pandas as pd
 import numpy as np
 
 Data = namedtuple("Data", ["stops", "durations", "trips_dates", "stoptimes"])
 
+EXTENSION = ".parq"
 
 def load_prepared_data(gtfs_folder):
-    paths = {field: os.path.join(gtfs_folder, field + ".p") for field in Data._fields}
-    dataframes = {field: pd.read_pickle(path) for field, path in paths.items()}
+    paths = {field: os.path.join(gtfs_folder, field + EXTENSION) for field in Data._fields}
+    dataframes = {field: pd.read_parquet(path) for field, path in paths.items()}
     data = Data(**dataframes)
     return data
 
 
 def _store(df, folder, name):
-    path = os.path.join(folder, name)
-    df.to_pickle(path)
+    path = Path(folder) / name
+    df.to_parquet(path)
 
 
 def store_durations(durations, gtfs_folder):
-    _store(durations, gtfs_folder, "durations.p")
+    _store(durations, gtfs_folder, "durations"+EXTENSION)
 
 
 def store_stops(stops, gtfs_folder):
-    _store(stops, gtfs_folder, "stops.p")
+    _store(stops, gtfs_folder, "stops"+EXTENSION)
 
 
 def store_trips_dates(trips_dates, gtfs_folder):
-    _store(trips_dates, gtfs_folder, "trips_dates.p")
+    _store(trips_dates, gtfs_folder, "trips_dates"+EXTENSION)
 
 
 def store_stoptimes(stoptimes, gtfs_folder):
-    _store(stoptimes, gtfs_folder, "stoptimes.p")
+    _store(stoptimes, gtfs_folder, "stoptimes"+EXTENSION)
 
 
 def load_raw_stops(gtfs_folder):
-    stops_path = os.path.join(gtfs_folder, "stops.txt")
+    stops_path = Path(gtfs_folder)/ "stops.txt"
 
     return pd.read_csv(
         stops_path,
@@ -46,7 +48,7 @@ def load_raw_stops(gtfs_folder):
 
 
 def load_raw_routes(gtfs_folder):
-    routes_path = os.path.join(gtfs_folder, "routes.txt")
+    routes_path = Path(gtfs_folder) /"routes.txt"
 
     return pd.read_csv(
         routes_path,
@@ -56,7 +58,7 @@ def load_raw_routes(gtfs_folder):
 
 
 def load_raw_calendar_dates(gtfs_folder):
-    path_calendar_dates = os.path.join(gtfs_folder, "calendar_dates.txt")
+    path_calendar_dates = Path(gtfs_folder) /"calendar_dates.txt"
     return pd.read_csv(
         path_calendar_dates,
         usecols=["service_id", "date"],
